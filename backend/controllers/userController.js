@@ -5,7 +5,7 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 
-// Register a user
+// =================================== REGISTER A USER ====================================================================================
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password } = req.body;
   const user = await User.create({
@@ -21,8 +21,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res);
 });
 
-// Login User
-
+// =================================== LOGIN USER =========================================================================================
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -46,7 +45,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-// Logout User
+// =================================== LOGOUT USER =========================================================================================
 exports.logout = catchAsyncErrors(async (req, res, next) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
@@ -59,7 +58,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Forgot Password
+// =================================== FORGOT PASSWORD =========================================================================================
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -96,6 +95,8 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+// =================================== RESET PASSWORD =========================================================================================
+
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   //Creating Token Hash
   const resetPasswordToken = crypto
@@ -119,6 +120,35 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   user.password = req.body.password;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendToken(user, 200, res);
+});
+
+// =================================== GET USER DETAILS =========================================================================================
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Old Password incorrect", 400));
+  }
+
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    return next(new ErrorHandler("New Passwords do not match", 400));
+  }
+
+  user.password = req.body.newPassword;
   await user.save();
 
   sendToken(user, 200, res);

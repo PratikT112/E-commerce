@@ -48,19 +48,19 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// JWT TOKEN
+// ====================================JWT TOKEN =========================================================================================
 userSchema.methods.getJWTToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
-// Compare Password
+// ====================================COMPARE PASSWORD =========================================================================================
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Generating password reset token
+// ====================================GENERATING RESET PASSWORD TOKEN ===================================================================
 userSchema.methods.getResetPasswordToken = function () {
   // Generating Token
   const resetToken = crypto.randomBytes(20).toString("hex");
