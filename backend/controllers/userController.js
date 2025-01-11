@@ -196,14 +196,14 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 // ====================================Make Admin -- Admin =========================================================================================
-exports.updateRole = catchAsyncErrors(async (req, res, next) => {
+exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {
     name: req.body.name,
     email: req.body.email,
     role: req.body.role,
   };
-  // We will add Cloudinary later
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+
+  const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
     useValidators: true,
     useFindAndModify: false,
@@ -213,18 +213,14 @@ exports.updateRole = catchAsyncErrors(async (req, res, next) => {
 });
 
 // ====================================Delete User -- Admin=========================================================================================
-exports.updateRole = catchAsyncErrors(async (req, res, next) => {
-  const newUserData = {
-    name: req.body.name,
-    email: req.body.email,
-    role: req.body.role,
-  };
-  // We will add Cloudinary later
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-    new: true,
-    useValidators: true,
-    useFindAndModify: false,
-  });
+exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new ErrorHandler(`User not found with ID: ${req.params.id}`));
+  } else {
+    await user.remove();
+  }
 
   sendToken(user, 200, res);
 });
