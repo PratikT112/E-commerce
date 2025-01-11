@@ -209,7 +209,10 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     useFindAndModify: false,
   });
 
-  sendToken(user, 200, res);
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 
 // ====================================Delete User -- Admin=========================================================================================
