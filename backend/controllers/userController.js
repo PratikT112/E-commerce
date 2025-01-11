@@ -169,4 +169,27 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-exports.getAllUsers = catchAsyncErrors();
+// ====================================Get Single user Admin =========================================================================================
+exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
+exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(
+      new ErrorHandler(`User does not exist with ID: ${req.params.id}`)
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
