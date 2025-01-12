@@ -93,13 +93,32 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
     product.numOfReviews = product.reviews.length;
   }
   let avg = 0;
-  product.ratings =
-    product.reviews.forEach((rev) => {
-      avg += rev.rating;
-    }) / product.reviews.length;
+  product.reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
+  product.ratings = avg / product.reviews.length;
 
   await product.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,
   });
+});
+
+// ====================================Get All Reviews =========================================================================================
+
+exports.getAllReviews = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404).json({
+      success: true,
+      message: `Product does not exist with ID: ${req.params.id}`,
+    });
+  } else {
+    const reviews = product.reviews;
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  }
 });
