@@ -203,13 +203,23 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     role: req.body.role,
   };
 
+  if (newUserData.role === "user") {
+    const adminCount = await User.countDocuments({ role: "admin" });
+    if (adminCount <= 1) {
+      return next(new ErrorHandler(`No admins left.`, 404));
+    }
+  }
+
   const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
     useValidators: true,
     useFindAndModify: false,
   });
 
-  sendToken(user, 200, res);
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 
 // ====================================Delete User -- Admin=========================================================================================
