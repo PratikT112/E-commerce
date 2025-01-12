@@ -219,7 +219,7 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler(`User not found with ID: ${req.params.id}`));
   } else {
-    await user.remove();
+    await user.deleteOne();
   }
 
   sendToken(user, 200, res);
