@@ -1,5 +1,6 @@
 const { kMaxLength } = require("buffer");
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid"); // Install the uuid library
 
 const productSchema = mongoose.Schema({
   name: {
@@ -48,6 +49,8 @@ const productSchema = mongoose.Schema({
   },
   reviews: [
     {
+      _id: false,
+      review_id: { type: String, required: true, default: uuidv4 },
       user: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
@@ -60,11 +63,6 @@ const productSchema = mongoose.Schema({
       },
       comment: {
         type: String,
-        required: true,
-      },
-      user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
         required: true,
       },
     },

@@ -115,10 +115,9 @@ exports.getAllReviews = catchAsyncErrors(async (req, res, next) => {
       message: `Product does not exist with ID: ${req.params.id}`,
     });
   } else {
-    const reviews = product.reviews;
     res.status(200).json({
       success: true,
-      reviews,
+      reviews: product.reviews,
     });
   }
 });
