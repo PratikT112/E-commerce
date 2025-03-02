@@ -7,8 +7,10 @@ const {
   getProductDetails,
   createProductReview,
   getAllReviews,
+  deleteReview,
 } = require("../controllers/productContoller");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const { isAscii } = require("validator");
 const router = express.Router();
 
 router.route("/products").get(getAllProducts);
@@ -25,5 +27,8 @@ router
 router.route("/product/:id").get(getProductDetails);
 
 router.route("/review").put(isAuthenticatedUser, createProductReview);
-router.route("/reviews/:id").get(getAllReviews);
+router
+  .route("/reviews/")
+  .get(getAllReviews)
+  .delete(isAuthenticatedUser, deleteReview);
 module.exports = router;
