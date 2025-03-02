@@ -6,6 +6,22 @@ const ApiFeatures = require("../utils/apiFeatures");
 //Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   req.body.user = req.user.id;
+  // Reviews Array Sanctity check and addition of Average rating
+  if (Array.isArray(req.body.reviews) && req.body.reviews.length > 0) {
+    if (req.body.reviews.length === req.body.numOfReviews) {
+      let ratingSum = 0;
+      req.body.reviews.forEach((rev) => (ratingSum += rev.rating));
+      req.body.ratings = ratingSum / req.body.reviews.length;
+    } else {
+      return next(
+        new ErrorHandler(
+          "Number of Reviews does not match numbers of reviews in Reviews Array",
+          404
+        )
+      );
+    }
+  }
+  // Reviews Array Sanctity check and addition of Average rating
 
   const product = await Product.create(req.body);
   res.status(201).json({
@@ -78,9 +94,10 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
   };
 
   const product = await Product.findById(productID);
-  const isReviewed = product.reviews.find(
-    (rev) => rev.user.toString() === req.user._id
-  );
+  const isReviewed = product.reviews.find((rev) => {
+    rev.user.toString() === req.user._id.toString();
+  });
+
   if (isReviewed) {
     product.reviews.forEach((rev) => {
       if (rev.user.toString() === req.user._id.toString()) {
@@ -107,7 +124,7 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
 // ====================================Get All Reviews =========================================================================================
 
 exports.getAllReviews = catchAsyncErrors(async (req, res, next) => {
-  const product = await Product.findById(req.query.id);
+  const product = await Product.findById(req.query.productId);
 
   if (!product) {
     res.status(404).json({
