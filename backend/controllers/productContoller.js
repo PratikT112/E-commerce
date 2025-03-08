@@ -30,7 +30,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Get all Products
+// ====================================Get all Products =========================================================================================
 exports.getAllProducts = catchAsyncErrors(async (req, res) => {
   const resultPerPage = 10;
 
@@ -46,7 +46,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res) => {
   });
 });
 
-// Update Product -- Admin
+// ====================================Update Product -- Admin =========================================================================================
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
   if (!product) {
