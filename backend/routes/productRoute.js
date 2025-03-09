@@ -8,12 +8,13 @@ const {
   createProductReview,
   getAllReviews,
   deleteReview,
+  recalculateRatings,
 } = require("../controllers/productContoller");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const { isAscii } = require("validator");
 const router = express.Router();
 
-router.route("/products").get(getAllProducts);
+router.route("/products").get(getAllProducts).patch(recalculateRatings);
 router
   .route("/admin/product/new")
   .post(isAuthenticatedUser, authorizeRoles("admin"), createProduct);
