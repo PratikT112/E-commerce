@@ -65,3 +65,18 @@ exports.myOrders = catchAsyncErrors(async (req, res, next) => {
     orders,
   });
 });
+
+// ====================================Get All Orders -- Admin =========================================================================================
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find();
+
+  if (orders.length < 1) {
+    return next(new ErrorHandler("No  Orders found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    count: orders.length,
+    orders,
+  });
+});
