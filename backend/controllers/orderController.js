@@ -70,13 +70,12 @@ exports.myOrders = catchAsyncErrors(async (req, res, next) => {
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
   const orders = await Order.find();
 
-  if (orders.length < 1) {
-    return next(new ErrorHandler("No  Orders found", 404));
-  }
+  let totalAmount = orders.reduce((acc, order) => acc + order.totalPrice, 0);
 
   res.status(200).json({
     success: true,
     count: orders.length,
+    totalAmount,
     orders,
   });
 });
